@@ -4,8 +4,8 @@ import copy
 import random
 import aniso8601
 
-def get_data(f, config = False):    
-    nb_playlists = int(f.read().count("_name"))
+def get_data(f, config = False):
+    nb_playlists = sum(1 for line in f if line.startswith("_name"))
     f.seek(0)#allows to read the file again, and dat is nice :)
     if config:
         f.readline()
@@ -344,7 +344,9 @@ def find_actions_configs(theData, theOldData):
             the_new_data.append((oldIndex,music[1],music[2],music[3],music[4],music[5],music[6]))
         list_actions = find_actions(the_new_data=the_new_data,playlist_id=id,list_actions=list_actions)
         for music in music_add:
-            inserting_at_position = theData[index]["musics"].index(music)
+            inserting_at_position = next(
+                j for j, m in enumerate(theData[index]["musics"]) if m[6] == music[6]
+            )
             this_action = ["im",music[6],music[5],inserting_at_position,id]
             list_actions.append(this_action)
 
@@ -365,7 +367,9 @@ def find_actions_configs(theData, theOldData):
     
     return list_actions
 
-def find_actions(the_new_data, playlist_id, list_actions = []):
+def find_actions(the_new_data, playlist_id, list_actions = None):
+    if list_actions is None:
+        list_actions = []
     #adding numbers to have for each music old position (music[0]) and new position (music[-1])
     the_new_data_nb = []
     for i in range(len(the_new_data)):
@@ -656,6 +660,8 @@ def sorting_an_area1(data):
         numbers.sort()
         very_specific_data = [data[number] for number in numbers]
         return very_specific_data, numbers
+    else:
+        raise ValueError("Expected 'e' for entire playlist or 's' for specific area.")
 
 def sorting_an_area2(data,sorted_very_specific_data,numbers):
     if numbers == "all":
@@ -666,6 +672,7 @@ def sorting_an_area2(data,sorted_very_specific_data,numbers):
         return data
 
 def save_config(data,name_of_config, playlist_number = None):
+    os.makedirs("configs", exist_ok=True)
     found_somewhere_to_save = False
     i=1
     while not found_somewhere_to_save:
@@ -697,7 +704,8 @@ def load_config(data,nb):
             for i in range(len(data)):
                 if data[i]["id"] == id:
                     data[i] = get_data(f, config=True)[0]
-                    return data             
+                    return data
+            return data
 
 def delete_config(nb):
     os.remove(f"configs/{nb}{nb}{nb}.txt")
@@ -710,7 +718,9 @@ def shuffle_playlist(music_list):
 
 def playlist_duration(music_list):
     sum_seconds = 0
-    for music in  music_list:
+    for music in music_list:
+        if music[3] == "Unknown":
+            continue
         timeDeltaObject = aniso8601.parse_duration(music[3])
         sum_seconds += timeDeltaObject.total_seconds()
     hours = int(sum_seconds//3600)
@@ -719,6 +729,8 @@ def playlist_duration(music_list):
     print(f"Your playlist duration is:\n{hours} hour{'s' if hours>1 else ''}, {minutes} minute{'s' if minutes>1 else ''} and {seconds} second{'s' if seconds >1 else ''}.")
 
 def return_total_seconds(music):
+    if music[3] == "Unknown":
+        return 0
     timeDeltaObject = aniso8601.parse_duration(music[3])
     return timeDeltaObject.total_seconds()
 
@@ -751,7 +763,7 @@ def playlist_manager():
             if answer == 1:
                 actual_name, new_name = input(f"Type in artist name you want to modify and new artist name in the following way:\nactual_artist_name|new_artist_name\n").split("|")
                 define_exceptions(actual_name,new_name)
-                theData = load_exceptions(theData=theData)
+                load_exceptions(theData=theData)
             elif answer == 2:
                 updating_data = False
                 answer = input("How do you want to list artists?\n(1) default order (in order of playlist)\n(2) ascending order (from artist with the fewest songs to artist with the most songs)\n(3) descending order (from artists with the most songs to artist with the fewest songs)\n")

@@ -64,7 +64,7 @@ def update_playlists():
                                 "kind": "youtube#video",
                                 "videoId": action[2]
                             },
-                            "position":action[3]
+                            "position":int(action[3])
                         }
                     }
                 )
@@ -80,7 +80,7 @@ def update_playlists():
                                 "kind": "youtube#video",
                                 "videoId": action[2]
                             },
-                            "position":action[3]
+                            "position":int(action[3])
                         }
                     }
                 )
@@ -113,6 +113,9 @@ def update_playlists():
                         }
                     }
                 )
+            else:
+                print(f"Unknown action '{action[0]}', skipping.")
+                continue
             request.execute()
             if added_playlists:
                 print("Waiting for creation of playlist on the servers")

@@ -35,15 +35,16 @@ def fetch_musics(playlist_id, music_count, playlist_name):
     print(f"Fetching musics from playlist : {playlist_name}")
     musics=[]
     iteration=0
+    nextPageToken = None
     while len(musics)< music_count:#count
         iteration+=1
         print(f"Iteration n°{iteration}")
-        if len(musics)==0:
+        if nextPageToken is None:
             request = youtubeService.playlistItems().list(
                 part=["snippet","id"],
                 playlistId= playlist_id,
                 maxResults= 50
-            )        
+            )
         else:
             request = youtubeService.playlistItems().list(
                 part=["snippet","id"],
@@ -52,10 +53,7 @@ def fetch_musics(playlist_id, music_count, playlist_name):
                 pageToken = nextPageToken
             )
         response = request.execute()
-        try:
-            nextPageToken = response["nextPageToken"]
-        except:
-            print("Run through all the musics")
+        nextPageToken = response.get("nextPageToken")
         #time request
         times = {}
         id_list = [music["snippet"]["resourceId"]["videoId"] for music in response["items"]]
@@ -66,14 +64,17 @@ def fetch_musics(playlist_id, music_count, playlist_name):
         #other caracteristics already in base response
         for music in response["items"]:
             music_name = music["snippet"]["title"].strip(" \n")
-            music_artist = music["snippet"]["videoOwnerChannelTitle"].strip(" \n")
+            music_artist = (music["snippet"].get("videoOwnerChannelTitle") or music["snippet"].get("channelTitle") or "Unknown Artist")
+            music_artist = music_artist.strip("\n")
             music_number = music["snippet"]["position"]
             music_id = music["snippet"]["resourceId"]["videoId"]
             music_id_long = music["id"]
             music_date_added_to_playlist = music["snippet"]["publishedAt"]
-            music_time = times[music_id]
+            music_time = times.get(music_id, "Unknown")
             music_date =''
             musics.append((music_number,music_artist,music_name,music_time,music_date, music_id,music_id_long, music_date_added_to_playlist))
+        if nextPageToken is None:
+            break
     return musics
         
 
