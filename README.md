@@ -49,7 +49,6 @@ How to use the project -- in 10 very simple steps for noobs (like me)(setup time
 
 1. Download the project and open it in your IDE
 
-Fetching your Google OAuth Credentials in order to be able to access your Google account via code
 2. Create a project on the google developer console https://console.cloud.google.com/
 
 3. Add the "YouTube Data API v3" to your project (search bar, then click on enable and select your project)
