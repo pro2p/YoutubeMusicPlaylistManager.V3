@@ -47,17 +47,19 @@ How the project globally works:
 ________________________________________________________________________________________________________________________________________________________________________________________________________
 How to use the project -- in 10 very simple steps for noobs (like me)(setup time: at the most 10min):
 
-1. Download the project and open it in your IDE.
+1. Download the project and open it in your IDE
+
+Fetching your Google OAuth Credentials in order to be able to access your Google account via code
 2. Create a project on the google developer console https://console.cloud.google.com/
-3. Add the "YouTube Data API v3" to your project
-4.Go to "APIs and Services" menu, then "Credentials" submenu and click on "create credentials", then "OAuth Client ID".
-5. Select "Web Application", name it how you like, click on "add URI" under "Authorised redirect URIs" and paste "http://localhost:8080/" (I used port 8080 following a tutorial, using another port will require modifying a tiny bit of code in the getYoutubeMusicData.py and updateYoutubeMusicData.py files), click on "create", your OAuth Client ID is created!
-6. Click on the "download json" button to download your OAuth Client ID as a json file
-7. Rename the file "client_secrets" and move it inside the "data_and_stuff" folder in the project
-8. Install the required packages that I wrote in the requirements.txt file using pip or elseway if they are not already installed ("pip install google-api-python-client","pip install google_auth_oauthlib","pip install aniso8601" in the terminal)
+3. Add the "YouTube Data API v3" to your project (search bar, then click on enable and select your project)
+4.Go to "APIs and Services" menu (cf navigation menu at the top left), then "Credentials" submenu and click on "Configure consent screen", fill in App Information (project name + mail), set Audience to "external", provide your email again then finish
+5. Back in the "Crecentials" page, click on "create credentials", then "OAuth Client ID". Select "Web Application", name it how you like, click on "add URI" under "Authorised redirect URIs" and paste "http://localhost:8080/" (I used port 8080 following a tutorial, using another port will require modifying a tiny bit of code in the getYoutubeMusicData.py and updateYoutubeMusicData.py files), click on "create", click on the "download json" button to download your OAuth Client ID as a json file
+6. Rename the file "client_secrets", create a "data_and_stuff" folder inside the project's folder and move "client_secrets" inside it
+7. Go to the "Credentials" page, then "OAuth Consent Screen" submenu, then "Audience" submenu, click on "Add users", fill in your email (and any other google account that will use the project, but beware if you share the same project you also share the API quotas!) and save
+8. Install the required packages that I wrote in the requirements.txt file using pip or elseway if they are not already installed ("pip install google-api-python-client","pip install google_auth_oauthlib","pip install aniso8601" in the terminal; you can create a virtual environment to install those packages only for this project if you want)
 9. Launch the project by running the main.py file ("python main.py" command in the terminal)
-10. When asked to select a google account, select your account (with your playlists), click on "advanced",then "Go to [the_name_you_gave_to_the_project]", and finally "Continue".
-You can then come back to your IDE and the project's running.
+10. When asked to select a google account, select your account (with your playlists), it will say "Google hasn't verified this app" click on "continue", then click again on "continue".
+You can then come back to your IDE and the project's running!
 
 Note: Youtube API limits requests with quotas, 10 000/day. I optimised the requests to their maximum (at least I think so) but it might happen that you run out of quotas. The program will throw an error in the console, you just have to wait the next day (which, I admit, is a bit annoying).
 ________________________________________________________________________________________________________________________________________________________________________________________________________
